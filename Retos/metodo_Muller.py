@@ -1,0 +1,149 @@
+from numpy import sign
+from numpy.lib.scimath import sqrt
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+
+def muller(f,x0,x1,x2,tol):
+    print("Muller: tolerancia ",tol)
+    x  = 0
+    x3 = 0
+    e=[]
+    r=[]
+    while True:
+        x+=1;
+        c = f(x2);
+        b = ((x0-x2)**2*(f(x1)-f(x2))-(x1-x2)**2*(f(x0)-f(x2)))/((x0-x2)*(x1-x2)*(x0-x1));
+        a = ((x1-x2)*(f(x0)-f(x2))-(x0-x2)*(f(x1)-f(x2)))/((x0-x2)*(x1-x2)*(x0-x1));
+        x3 = x2-(2*c)/(b+sign(b)*sqrt(b**2-4*a*c));
+        error = abs(x3-x2);
+        x0 = x1; x1 = x2; x2 = x3;
+        e.append(error)
+        r.append(x3)
+        print("Iteracion ", x,"Solucion 1: ", x3, " Error: ",error)
+        if error < tol:
+            break
+    return x3,range(1,x+1),e,r
+
+def aitken(x0,x1,x2,tol):
+  print("Aitken")
+  r = []
+  e = []
+  x = 0
+  while True:
+    xa = x2
+    x2 = x2 - (((x2-x1)**2)/(x2-2*x1+x0))
+    x0 = x1
+    x1 = xa
+    x+=1
+    er = abs(x2 - xa)
+    print("it ", x, ": solucion ",x2," error: ", er)
+    e.append(er)
+    r.append(x2)
+    if er <= tol:
+      break
+  return range(1,x+1),e,r
+
+tol = 1e-16
+f = lambda x: np.sin(x)
+# imprimir los 3 intervalos
+col = ["r","b","g"]
+#for j in [1e-8,1e-16,1e-32]: 0.5149332646611294
+x3, xp, e,r = muller(f, 3*np.pi/2, 3*np.pi/4 , np.pi/2 ,tol)
+plt.plot(xp, e,col[0])
+e.clear()
+x0,x1,x2 = [r[0],r[1],r[2]]
+r.clear()
+print("-> ",x0,x1,x2)
+xp,e,r = aitken(x0,x1,x2,tol)
+plt.plot(xp, e,col[1])
+###############################
+plt.title("Valor del Error por Iteración")
+plt.xlabel("Número de iteración")
+plt.ylabel("Valor del Error")
+plt.legend(['Muller', 'Aitken'])
+
+
+class MathTextSciFormatter(mticker.Formatter):
+    def __init__(self, fmt="%1.2e"):
+        self.fmt = fmt
+    def __call__(self, x, pos=None):
+        s = self.fmt % x
+        decimal_point = '.'
+        positive_sign = '+'
+        tup = s.split('e')
+        significand = tup[0].rstrip(decimal_point)
+        sign = tup[1][0].replace(positive_sign, '')
+        exponent = tup[1][1:].lstrip('0')
+        if exponent:
+            exponent = '10^{%s%s}' % (sign, exponent)
+        if significand and exponent:
+            s =  r'%s{\times}%s' % (significand, exponent)
+        else:
+            s =  r'%s%s' % (significand, exponent)
+        return "${}$".format(s)
+
+plt.gca().yaxis.set_major_formatter(MathTextSciFormatter("%1.2e"))
+
+plt.show()
+
+f = lambda x: (np.cos(2*x))**2 - x**2
+
+x3, xp, e,r = muller(f, 3*np.pi/2, 3*np.pi/4 , np.pi/2 ,tol)
+plt.plot(xp, e,col[0])
+e.clear()
+x0,x1,x2 = [r[0],r[1],r[2]]
+r.clear()
+print("-> ",x0,x1,x2)
+xp,e,r = aitken(x0,x1,x2,tol)
+plt.plot(xp, e,col[1])
+###############################
+plt.title("Valor del Error por Iteración")
+plt.xlabel("Número de iteración")
+plt.ylabel("Valor del Error")
+plt.legend(['Muller', 'Aitken'])
+
+plt.gca().yaxis.set_major_formatter(MathTextSciFormatter("%1.2e"))
+
+plt.show()
+
+f = lambda x: x2+2*x+5
+
+x3, xp, e,r = muller(f, 3*np.pi/2, 3*np.pi/4 , np.pi/2 ,tol)
+plt.plot(xp, e,col[0])
+e.clear()
+x0,x1,x2 = [r[0],r[1],r[2]]
+r.clear()
+print("-> ",x0,x1,x2)
+xp,e,r = aitken(x0,x1,x2,tol)
+plt.plot(xp, e,col[1])
+###############################
+plt.title("Valor del Error por Iteración")
+plt.xlabel("Número de iteración")
+plt.ylabel("Valor del Error")
+plt.legend(['Muller', 'Aitken'])
+
+plt.gca().yaxis.set_major_formatter(MathTextSciFormatter("%1.2e"))
+
+plt.show()
+
+f = lambda x: x*np.sin(x) - 1
+
+
+x3, xp, e,r = muller(f, 3*np.pi/2, 3*np.pi/4 , np.pi/2 ,tol)
+plt.plot(xp, e,col[0])
+e.clear()
+x0,x1,x2 = [r[0],r[1],r[2]]
+r.clear()
+print("-> ",x0,x1,x2)
+xp,e,r = aitken(x0,x1,x2,tol)
+plt.plot(xp, e,col[1])
+###############################
+plt.title("Valor del Error por Iteración")
+plt.xlabel("Número de iteración")
+plt.ylabel("Valor del Error")
+plt.legend(['Muller', 'Aitken'])
+
+plt.gca().yaxis.set_major_formatter(MathTextSciFormatter("%1.2e"))
+
+plt.show()
